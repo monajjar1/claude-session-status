@@ -1,0 +1,13 @@
+{
+  "name": "session-status",
+  "owner": {
+    "name": "Mohammad AlNajjar"
+  },
+  "plugins": [
+    {
+      "name": "session-status",
+      "source": "./"
+    }
+  ],
+  "description": "Live context and usage-limit line for the Claude Code prompt footer"
+}

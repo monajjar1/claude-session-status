@@ -1,0 +1,11 @@
+{
+  "name": "session-status",
+  "version": "0.1.0",
+  "description": "Footer: model, context fill, current-session usage limit with reset time, session name",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Mohammad AlNajjar"
+  },
+  "repository": "https://github.com/monajjar1/claude-session-status",
+  "license": "MIT"
+}
