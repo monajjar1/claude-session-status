@@ -51,10 +51,27 @@ async function draw($: Engine) {
   await update($, line, () => text)
 }
 
+// session.measure only fires after a turn: measure at startup (nothing sent yet, e.g. a local model) and after a compaction.
+async function remeasure($: Engine, tokens?: number) {
+  const u = await $.session.usage({ breakdown: 'summary' }).catch(() => undefined)
+  if (!u) return
+  last = { ...u, changed: ['context'], context: { ...u.context, tokens: tokens ?? u.context.breakdown?.totalTokens ?? u.context.tokens } }
+  await draw($)
+}
+
 export const register: Register = on => {
-  on('session.start', ($, e, next) => {
+  on('session.start', async ($, e, next) => {
+    const r = await next(e)
     $.clock.every(60_000, () => draw($)) // keeps the reset countdown fresh between turns
-    return next(e)
+    await remeasure($)
+    return r
+  })
+
+  on('session.compact', async ($, e, next) => {
+    const r = await next(e)
+    // precompute only prepares a summary; a subagent's compaction isn't the main context
+    if (e.trigger !== 'precompute' && !e.agentId && r.skip === undefined) await remeasure($, r.tokensAfter)
+    return r
   })
 
   on('session.measure', async ($, e, next) => {
